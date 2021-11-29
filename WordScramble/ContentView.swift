@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct ContentView: View {
     @State private var usedWords = [String]()
     @State private var rootWord = ""
@@ -29,6 +30,9 @@ struct ContentView: View {
                             Text(word)
                         }
                     }
+                }
+                Section("New Game?") {
+                    Button("Yes", action: startGame)
                 }
             }
             .navigationTitle(rootWord)
@@ -62,6 +66,16 @@ struct ContentView: View {
         
         guard isReal(word: answer) else {
             wordError(title: "Word not recognized", message: "You can't just make words up!")
+            return
+        }
+        
+        guard isGreaterThan2(word: answer) else {
+            wordError(title: "Word is too short to be valid", message: "Words must be longer than 2 letters!")
+            return
+        }
+        
+        guard isNotSameWord(word: answer) else {
+            wordError(title: "Word is the same", message: "Come on, it is asking for different words!")
             return
         }
         
@@ -109,6 +123,14 @@ struct ContentView: View {
         let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
 
         return misspelledRange.location == NSNotFound
+    }
+    
+    func isGreaterThan2(word: String) -> Bool {
+        return word.count > 2
+    }
+    
+    func isNotSameWord(word: String) -> Bool {
+        return word != rootWord
     }
     
     func wordError(title: String, message: String) {
