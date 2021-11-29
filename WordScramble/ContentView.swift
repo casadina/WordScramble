@@ -8,31 +8,45 @@
 import SwiftUI
 
 struct ContentView: View {
+    @State private var usedWords = [String]()
+    @State private var rootWord = ""
+    @State private var newWord = ""
+    
+    func addNewWord() {
+        // lowercase and trim the word
+        let answer = newWord.lowercased().trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        // exit if remaining string is empty
+        guard answer.count > 0 else { return }
+        
+        // extra validation to come
+        
+        withAnimation {
+            usedWords.insert(answer, at: 0)
+        }
+        
+        newWord = ""
+    }
+    
     var body: some View {
-        let input = "a b c"
-        let letters = input.components(separatedBy: " ")
-        let letter = letters.randomElement()
-        let trimmed = letter?.description.trimmingCharacters(in: .whitespacesAndNewlines)
-        let word = "swift"
-        let checker = UITextChecker()
-        let range = NSRange(location: 0, length: word.utf16.count)
-        let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
-        let allGood = misspelledRange.location == NSNotFound
-        HStack {
+        NavigationView {
             List {
-                Section(trimmed ?? "o") {
-                    ForEach(0..<5) {
-                        Text("Dynamic row \($0)")
+                Section {
+                    TextField("Enter your word", text: $newWord)
+                }
+                
+                Section {
+                    ForEach(usedWords, id: \.self) { word in
+                        HStack {
+                            Image(systemName: "\(word.count).circle")
+                            Text(word)
+                        }
                     }
                 }
-                Section("Section 2") {
-                    Text("Static Row 1")
-                }
             }
-            .listStyle(.inset)
-            Form {
-                Text("Hello")
-            }
+            .navigationTitle(rootWord)
+            .onSubmit(addNewWord)
+            .autocapitalization(.none)
         }
     }
 }
